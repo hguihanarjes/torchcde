@@ -183,3 +183,15 @@ def test_rectilinear_preparation():
             # Rectilinear solution
             rectilinear = torchcde.linear_interpolation_coeffs(x, rectilinear=0)
             assert torch.equal(rect_true[~torch.isnan(rect_true)], rectilinear[~torch.isnan(rect_true)])
+
+
+def test_rectilinear_rejects_non_integer_time_index():
+    x = torch.rand(4, 2)
+    with pytest.raises(ValueError, match="integer"):
+        torchcde.linear_interpolation_coeffs(x, rectilinear=1.0)
+
+
+def test_rectilinear_rejects_out_of_range_time_index():
+    x = torch.rand(4, 2)
+    with pytest.raises(ValueError, match="Time index"):
+        torchcde.linear_interpolation_coeffs(x, rectilinear=2)
