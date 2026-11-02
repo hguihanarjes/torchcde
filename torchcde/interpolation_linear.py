@@ -108,11 +108,12 @@ def _prepare_rectilinear_interpolation(data, time_index):
         A tensor, now of shape (..., 2 * length - 1, input_channels] that can be fed to linear interpolation coeffs to
             give rectilinear coeffs.
     """
-    # Check time_index is of the correct format
+    # Validate time_index here rather than relying on assert: asserts are disabled under python -O.
     n_channels = data.size(-1)
-    assert isinstance(time_index, int), "Index of the time channel must be an integer in [0, {}]".format(n_channels - 1)
-    assert 0 <= time_index < n_channels, "Time index must be in [0, {}], was given {}." \
-                                         "".format(n_channels - 1, time_index)
+    if not isinstance(time_index, int):
+        raise ValueError("Index of the time channel must be an integer in [0, {}]".format(n_channels - 1))
+    if not 0 <= time_index < n_channels:
+        raise ValueError("Time index must be in [0, {}], was given {}.".format(n_channels - 1, time_index))
 
     times = data[..., time_index]
     assert not torch.isnan(times).any(), "There exist nan values in the time column which is not allowed. If the " \
